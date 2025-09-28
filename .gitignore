@@ -1,0 +1,17 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+.idea/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# 数据集
+dataset/
+
+# 模型文件
+*.pth
+*.onnx
+*.onnx.data
