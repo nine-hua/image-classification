@@ -13,14 +13,14 @@ transform = transforms.Compose([
 ])
 
 # 加载数据
-train_dataset = datasets.ImageFolder('dataset/train', transform=transform)
-val_dataset = datasets.ImageFolder('dataset/val', transform=transform)
+train_dataset = datasets.ImageFolder('dataset/crop/train', transform=transform)
+val_dataset = datasets.ImageFolder('dataset/crop/val', transform=transform)
 
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
 val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=32)
 
 # 使用预训练 ResNet18
-model = models.resnet18(pretrained=True)
+model = models.resnet34(pretrained=True)
 num_classes = len(train_dataset.classes)
 model.fc = nn.Linear(model.fc.in_features, num_classes)
 
@@ -32,7 +32,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
 
-for epoch in range(3):  # 训练3轮，快速测试
+for epoch in range(10):  # 训练3轮，快速测试
     model.train()
     for inputs, labels in train_loader:
         inputs, labels = inputs.to(device), labels.to(device)
@@ -56,14 +56,14 @@ for epoch in range(3):  # 训练3轮，快速测试
     print(f"Epoch {epoch+1}, Accuracy: {100 * correct / total:.2f}%")
 
 # 保存 PyTorch 模型
-torch.save(model.state_dict(), "model.pth")
+torch.save(model.state_dict(), "output/model.pth")
 
 # 导出 ONNX 模型
 dummy_input = torch.randn(1, 3, 224, 224).to(device)
 torch.onnx.export(
     model,
     (dummy_input,),
-    "model.onnx",
+    "output/model.onnx",
     input_names=["input"],
     output_names=["output"],
     dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
